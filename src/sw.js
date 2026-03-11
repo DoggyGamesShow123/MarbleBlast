@@ -1,39 +1,40 @@
-/* src/sw.js — Offline + "no leaderboard" service worker */
+/* src/sw.js — Offline caching + "no leaderboard", but allow level/assets loading */
 
-const CACHE_VERSION = 'mbw-v1';
-const PRECACHE = `${CACHE_VERSION}-precache`;
-const RUNTIME = `${CACHE_VERSION}-runtime`;
+const CACHE_VERSION = 'mbw-v3';                 // bump to force clients to refresh
+const PRECACHE = `${CACHE_VERSION}-pre`;
+const RUNTIME  = `${CACHE_VERSION}-rt`;
 
 /**
- * Paths we want to block (no leaderboard, no score submissions).
- * Adjust if your console shows different endpoints.
+ * Block only leaderboard-related endpoints (any HTTP method).
+ * Do NOT block generic /server or /api routes so resources can still load.
+ * Adjust or add patterns if your Network tab shows different paths.
  */
 const BLOCKED_PATHS = [
-  /leaderboard/i,
-  /scores?/i,
-  /submit/i,
-  /api/i,
-  /server/i
+  /\/leaderboard\b/i,
+  /\/scores?\b/i,
+  /\/submit(-score)?\b/i,
+  /\/top-?times?\b/i
 ];
 
-/**
- * Core files to precache. Adjust names if your bundle differs.
- * The bundle produced by "npm run bundle" writes to dist/ with index.html + bundle.js
- * per upstream docs.
- */
+/** Core files to precache for first load + offline shell */
 const CORE = [
-  './',            // GitHub Pages will serve subpath; relative scope is important
+  './',                // keep relative for GitHub Pages subpath hosting
   './index.html',
   './manifest.json',
-  './bundle.js',
+  './js/bundle.js',
   './favicon.ico'
 ];
 
+/* ---------- Install / Activate ---------- */
+
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(PRECACHE).then(cache => cache.addAll(CORE))
-      .then(() => self.skipWaiting())
-      .catch(() => self.skipWaiting())
+    (async () => {
+      const cache = await caches.open(PRECACHE);
+      // Use cache:'reload' so we bypass any transient HTTP cache
+      await cache.addAll(CORE.map(u => new Request(u, { cache: 'reload' })));
+      await self.skipWaiting();
+    })().catch(() => self.skipWaiting())
   );
 });
 
@@ -42,21 +43,20 @@ self.addEventListener('activate', event => {
     const names = await caches.keys();
     await Promise.all(
       names
-        .filter(n => ![PRECACHE, RUNTIME].includes(n))
+        .filter(n => n !== PRECACHE && n !== RUNTIME)
         .map(n => caches.delete(n))
     );
     await self.clients.claim();
   })());
 });
 
+/* ---------- Fetch ---------- */
+
 self.addEventListener('fetch', event => {
   const req = event.request;
-  // Only handle GETs
-  if (req.method !== 'GET') return;
-
   const url = new URL(req.url);
 
-  // Block leaderboard / API attempts entirely with a stub response.
+  // 1) Block leaderboard endpoints completely (for ANY method).
   if (BLOCKED_PATHS.some(rx => rx.test(url.pathname))) {
     event.respondWith(
       new Response(JSON.stringify({ ok: false, disabled: true, offline: true }), {
@@ -67,53 +67,67 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Same-origin: cache-first for static assets; network-first for documents.
-  if (url.origin === location.origin) {
-    const dest = req.destination; // 'document' | 'script' | 'style' | 'image' | 'audio' | 'font' | 'worker' | '' …
+  // For non-GET requests (that aren't blocked), let them pass through untouched.
+  if (req.method !== 'GET') return;
 
-    // Documents: try network, fall back to cache (so updates show up quickly).
-    if (dest === 'document' || dest === '') {
-      event.respondWith((async () => {
-        try {
-          const fresh = await fetch(req);
-          const cache = await caches.open(RUNTIME);
-          cache.put(req, fresh.clone());
-          return fresh;
-        } catch {
-          const cached = await caches.match(req);
-          return cached || caches.match('./index.html');
-        }
-      })());
+  // 2) Same-origin requests
+  if (url.origin === self.location.origin) {
+    // Treat navigation/documents as network-first so updates show quickly,
+    // with a fallback to cached shell (index.html) while offline.
+    if (req.mode === 'navigate' || req.destination === 'document' || req.destination === '') {
+      event.respondWith(networkFirstWithFallbackToShell(req));
       return;
     }
 
-    // Static assets: cache-first; populate runtime cache on miss.
-    event.respondWith((async () => {
-      const cached = await caches.match(req);
-      if (cached) return cached;
-      try {
-        const fresh = await fetch(req);
-        const cache = await caches.open(RUNTIME);
-        cache.put(req, fresh.clone());
-        return fresh;
-      } catch {
-        // last resort: offline fallback to index
-        return caches.match('./index.html');
-      }
-    })());
+    // Static assets (scripts, styles, images, audio, fonts, etc.): cache-first
+    event.respondWith(cacheFirstRuntime(req));
     return;
   }
 
-  // Cross-origin (e.g., fonts, music CDN): network-first with cache fallback
-  event.respondWith((async () => {
-    try {
-      const fresh = await fetch(req, { mode: 'cors' });
-      const cache = await caches.open(RUNTIME);
-      cache.put(req, fresh.clone());
-      return fresh;
-    } catch {
-      const cached = await caches.match(req);
-      return cached || new Response('', { status: 204 });
-    }
-  })());
+  // 3) Cross-origin requests: network-first (then cached fallback)
+  event.respondWith(networkFirstRuntime(req));
 });
+
+/* ---------- Strategies ---------- */
+
+async function networkFirstWithFallbackToShell(request) {
+  try {
+    const fresh = await fetch(request);
+    const rt = await caches.open(RUNTIME);
+    rt.put(request, fresh.clone());
+    return fresh;
+  } catch {
+    // try runtime cache, then the shell
+    const cached = await caches.match(request);
+    return cached || caches.match('./index.html');
+  }
+}
+
+async function cacheFirstRuntime(request) {
+  const cached = await caches.match(request);
+  if (cached) return cached;
+
+  try {
+    const fresh = await fetch(request);
+    const rt = await caches.open(RUNTIME);
+    rt.put(request, fresh.clone());
+    return fresh;
+  } catch {
+    // last resort: shell for same-origin doc requests; otherwise empty
+    return (request.destination === 'document')
+      ? (await caches.match('./index.html'))
+      : new Response('', { status: 204 });
+  }
+}
+
+async function networkFirstRuntime(request) {
+  try {
+    const fresh = await fetch(request, { mode: request.mode || 'cors' });
+    const rt = await caches.open(RUNTIME);
+    rt.put(request, fresh.clone());
+    return fresh;
+  } catch {
+    const cached = await caches.match(request);
+    return cached || new Response('', { status: 204 });
+  }
+}
