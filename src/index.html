@@ -13,8 +13,10 @@
     <!--<meta name="DISABLED twitter:card" content="summary_large_image">-->
     <link rel="shortcut icon" href="./assets/img/mbp.png" id="favicon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <!-- changed from /manifest.json to ./manifest.json for GitHub Pages subpath compatibility -->
+
+    <!-- CHANGED: from /manifest.json to ./manifest.json -->
     <link rel="manifest" href="./manifest.json">
+
     <link rel="apple-touch-icon" href="./assets/img/app-icon/180x180.png">
     <link rel="apple-touch-icon image_src" href="./assets/img/app-icon/180x180.png">
 
@@ -406,7 +408,7 @@
               <div>Super Speed PowerUp - gives you a burst of speed.</div>
             </div>
             <div class="help-canvas-row">
-              <canvas width="80" height="80" data-scene="superJump"></canvas>
+              <canvas width="80" height="80" data-scenes="superJump" data-scene="superJump"></canvas>
               <div>Super Jump PowerUp - gives you a big jump up.</div>
             </div>
             <div class="help-canvas-row">
@@ -421,7 +423,7 @@
           <div class="help-page">
             <div class="help-heading">Bonus Items (2/2)</div>
             <div class="help-canvas-row">
-              <canvas width="80" height="80" data-scenes="gyrocopter" data-scene="gyrocopter"></canvas>
+              <canvas width="80" height="80" data-scene="gyrocopter"></canvas>
               <div>Gyrocopter PowerUp - slows your fall in the air.</div>
             </div>
             <div class="help-canvas-row">
@@ -459,7 +461,7 @@
               <div>Land Mine - Warning! &nbsp;Explodes on contact!</div>
             </div>
             <div class="help-canvas-row">
-              <canvas width="80" height="80" data-scenes="oilslick" data-scene="oilslick" style="margin-top: 17px;"></canvas>
+              <canvas width="80" height="80" data-scene="oilslick" style="margin-top: 17px;"></canvas>
               <div>Oil Slick - you won't have much traction on these<br>surfaces.</div>
             </div>
           </div>
@@ -566,7 +568,7 @@
             <p></p>
           </div>
           <div id="rebind-confirm" class="hidden">
-            <img src="./assets/ui/common/dialog.png">
+          <img src="./assets/ui/common/dialog.png">
             <p></p>
             <img id="rebind-confirm-yes">
             <img id="rebind-confirm-no">
