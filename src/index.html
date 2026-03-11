@@ -13,10 +13,8 @@
     <!--<meta name="DISABLED twitter:card" content="summary_large_image">-->
     <link rel="shortcut icon" href="./assets/img/mbp.png" id="favicon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-
-    <!-- CHANGED: from /manifest.json to ./manifest.json -->
+    <!-- subpath-safe -->
     <link rel="manifest" href="./manifest.json">
-
     <link rel="apple-touch-icon" href="./assets/img/app-icon/180x180.png">
     <link rel="apple-touch-icon image_src" href="./assets/img/app-icon/180x180.png">
 
@@ -427,7 +425,7 @@
               <div>Gyrocopter PowerUp - slows your fall in the air.</div>
             </div>
             <div class="help-canvas-row">
-              <canvas width="80" height="80" data-scene="timeTravel"></canvas>
+              <canvas width="80" height="80" data-scenes="timeTravel" data-scene="timeTravel"></canvas>
               <div>Time Travel - takes some time off the clock.</div>
             </div>
             <div class="help-canvas-row">
@@ -461,7 +459,7 @@
               <div>Land Mine - Warning! &nbsp;Explodes on contact!</div>
             </div>
             <div class="help-canvas-row">
-              <canvas width="80" height="80" data-scene="oilslick" style="margin-top: 17px;"></canvas>
+              <canvas width="80" height="80" data-scenes="oilslick" data-scene="oilslick" style="margin-top: 17px;"></canvas>
               <div>Oil Slick - you won't have much traction on these<br>surfaces.</div>
             </div>
           </div>
@@ -568,7 +566,7 @@
             <p></p>
           </div>
           <div id="rebind-confirm" class="hidden">
-          <img src="./assets/ui/common/dialog.png">
+            <img src="./assets/ui/common/dialog.png">
             <p></p>
             <img id="rebind-confirm-yes">
             <img id="rebind-confirm-no">
@@ -613,7 +611,7 @@
       </div>
     </div>
 
-    <div id="video-renderer" class="hidden"> 
+    <div id="video-renderer" class="hidden">  
       <div>
         <h1>Video Renderer</h1>
         <div class="_config">
@@ -661,13 +659,166 @@
     <!-- Main bundle -->
     <script src="./js/bundle.js" defer></script>
 
-    <!-- Register service worker for offline + no-leaderboard -->
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js').catch(console.error);
-        });
+    <!-- Temp Dev Tools overlay (toggle with ~). Remove when done. -->
+    <style id="mbw-devtools-style">
+      #mbw-devtools {
+        all: initial;
+        position: fixed;
+        z-index: 999999;
+        top: 12px;
+        right: 12px;
+        width: 380px;
+        max-height: 70vh;
+        background: rgba(15, 23, 42, 0.95);
+        color: #e5e7eb;
+        font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(0,0,0,.35);
+        display: grid;
+        grid-template-rows: auto auto 1fr;
+        overflow: hidden;
       }
-    </script>
-  </body>
-</html>
+      #mbw-devtools header {
+        display: flex; align-items: center; gap: 8px;
+        padding: 8px 10px; background: #0b1220; border-bottom: 1px solid #334155;
+      }
+      #mbw-devtools header b { color: #93c5fd; font-weight: 700; }
+      #mbw-devtools .row {
+        display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 10px; border-bottom: 1px solid #334155;
+      }
+      #mbw-devtools button {
+        all: unset; cursor: pointer; padding: 6px 10px; border-radius: 6px;
+        background: #1f2937; border: 1px solid #4b5563; color: #e5e7eb;
+      }
+      #mbw-devtools button:hover { background:#374151; }
+      #mbw-devtools .pill { padding: 2px 6px; border: 1px solid #475569; border-radius: 999px; background:#111827; }
+      #mbw-devtools .muted { color:#9ca3af; }
+      #mbw-devtools .log {
+        padding: 8px 10px; overflow: auto; background:#0a0f1a;
+        font-size: 12px; white-space: pre-wrap; word-break: break-word;
+      }
+      #mbw-devtools .log .ok    { color:#bbf7d0; }
+      #mbw-devtools .log .warn  { color:#fde68a; }
+      #mbw-devtools .log .err   { color:#fecaca; }
+      #mbw-devtools .log .info  { color:#bae6fd; }
+      #mbw-devtools .foot {
+        padding:6px 10px; background:#0b1220; border-top:1px solid #334155;
+        display:flex; justify-content:space-between; align-items:center; gap:6px;
+      }
+      #mbw-devtools .linkish { color:#93c5fd; cursor:pointer; text-decoration:underline; }
+      #mbw-devtools.hidden { display:none; }
+    </style>
+
+    <div id="mbw-devtools" class="hidden" role="region" aria-label="Temp Dev Tools">
+      <header>
+        <b>Temp Dev Tools</b>
+        <span class="pill" id="mbw-sw-state">SW: n/a</span>
+        <span class="pill" id="mbw-base">base: n/a</span>
+      </header>
+
+      <div class="row">
+        <button id="mbw-sw-info">SW Info</button>
+        <button id="mbw-sw-unreg">SW Unregister</button>
+        <button id="mbw-clear-caches">Clear Caches</button>
+        <button id="mbw-reload">Reload</button>
+        <button id="mbw-bust">Reload (bust)</button>
+        <button id="mbw-clear-log">Clear Log</button>
+        <span class="muted">Toggle: <b>~</b></span>
+      </div>
+
+      <div class="log" id="mbw-log" aria-live="polite"></div>
+
+      <div class="foot">
+        <span class="muted">Capturing: fetch errors, resource errors, console</span>
+        <span class="linkish" id="mbw-collapse">Hide</span>
+      </div>
+    </div>
+
+    <script>
+      (() => {
+        if (location.search.includes('nodevtools')) return;
+
+        const $ = (s, r = document) => r.querySelector(s);
+        const panel  = $('#mbw-devtools');
+        const logEl  = $('#mbw-log');
+        const swPill = $('#mbw-sw-state');
+        const basePill = $('#mbw-base');
+
+        const log = (msg, cls='info') => {
+          const time = new Date().toLocaleTimeString();
+          const div = document.createElement('div');
+          div.className = cls;
+          div.textContent = `[${time}] ${msg}`;
+          logEl.appendChild(div);
+          logEl.scrollTop = logEl.scrollHeight;
+        };
+
+        const toggle = () => panel.classList.toggle('hidden');
+        document.addEventListener('keydown', (e) => { if (e.key === '~') toggle(); });
+        window.addEventListener('load', () => setTimeout(() => panel.classList.remove('hidden'), 300));
+
+        const baseTag = document.querySelector('base');
+        basePill.textContent = `base: ${baseTag?.getAttribute('href') || '(none)'}`;
+
+        async function refreshSWStatus() {
+          try {
+            const regs = await navigator.serviceWorker?.getRegistrations?.() || [];
+            const hasCtrl = !!navigator.serviceWorker?.controller;
+            const scopes = regs.map(r => r.scope.replace(location.origin, ''));
+            swPill.textContent = `SW: ${hasCtrl ? 'active' : 'none'} ${scopes.length ? `@ ${scopes.join(',')}` : ''}`;
+          } catch {
+            swPill.textContent = 'SW: n/a';
+          }
+        }
+        refreshSWStatus();
+
+        $('#mbw-sw-info')?.addEventListener('click', async () => {
+          try {
+            const regs = await navigator.serviceWorker?.getRegistrations?.() || [];
+            const states = regs.map(r => ({
+              scope: r.scope,
+              active: !!r.active,
+              installing: !!r.installing,
+              waiting: !!r.waiting,
+            }));
+            log(`SW Info: ${JSON.stringify(states, null, 2)}`, 'info');
+          } catch (e) { log(`SW Info error: ${e}`, 'err'); }
+        });
+
+        $('#mbw-sw-unreg')?.addEventListener('click', async () => {
+          try {
+            const regs = await navigator.serviceWorker?.getRegistrations?.() || [];
+            await Promise.all(regs.map(r => r.unregister()));
+            await caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))));
+            await refreshSWStatus();
+            log('Unregistered all SWs and cleared caches. Reloading…', 'warn');
+            setTimeout(() => location.reload(), 400);
+          } catch (e) { log(`SW Unregister error: ${e}`, 'err'); }
+        });
+
+        $('#mbw-clear-caches')?.addEventListener('click', async () => {
+          try {
+            const keys = await caches.keys();
+            await Promise.all(keys.map(k => caches.delete(k)));
+            log(`Cleared caches: [${keys.join(', ')}]`, 'warn');
+          } catch (e) { log(`Clear caches error: ${e}`, 'err'); }
+        });
+
+        $('#mbw-reload')?.addEventListener('click', () => location.reload());
+
+        $('#mbw-bust')?.addEventListener('click', () => {
+          const u = new URL(location.href);
+          u.searchParams.set('_bust', Date.now().toString());
+          location.href = u.toString();
+        });
+
+        $('#mbw-clear-log')?.addEventListener('click', () => (logEl.textContent = ''));
+        $('#mbw-collapse')?.addEventListener('click', toggle);
+
+        ['log','info','warn','error'].forEach(k => {
+          const orig = console[k].bind(console);
+          console[k] = (...args) => {
+            try {
+              const text = args.map(a => {
+                if (a instanceof Error
