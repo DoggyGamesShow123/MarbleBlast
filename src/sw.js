@@ -1,14 +1,10 @@
-/* src/sw.js — Offline caching + "no leaderboard", but allow level/assets loading */
+/* src/sw.js — Load levels/assets from repo (rewrite /server/* -> ./*), offline cache, no leaderboard */
 
-const CACHE_VERSION = 'mbw-v3';                 // bump to force clients to refresh
+const CACHE_VERSION = 'mbw-v4';              // bump to force client update on deploy
 const PRECACHE = `${CACHE_VERSION}-pre`;
 const RUNTIME  = `${CACHE_VERSION}-rt`;
 
-/**
- * Block only leaderboard-related endpoints (any HTTP method).
- * Do NOT block generic /server or /api routes so resources can still load.
- * Adjust or add patterns if your Network tab shows different paths.
- */
+/* Block only leaderboard-related endpoints (any method). */
 const BLOCKED_PATHS = [
   /\/leaderboard\b/i,
   /\/scores?\b/i,
@@ -16,22 +12,42 @@ const BLOCKED_PATHS = [
   /\/top-?times?\b/i
 ];
 
-/** Core files to precache for first load + offline shell */
+/* Precache your app shell. Make sure bundle path matches your HTML. */
 const CORE = [
-  './',                // keep relative for GitHub Pages subpath hosting
+  './',
   './index.html',
   './manifest.json',
   './js/bundle.js',
   './favicon.ico'
 ];
 
-/* ---------- Install / Activate ---------- */
+/* --- Helpers ------------------------------------------------------------- */
+
+/** Return site base path (e.g., '/<repo>/' on GitHub Pages). */
+function basePath() {
+  const scope = new URL(self.registration.scope);
+  return scope.pathname.endsWith('/') ? scope.pathname : scope.pathname + '/';
+}
+
+/** True if URL path begins with a site-relative prefix (ignoring basePath). */
+function pathStartsWith(url, prefix) {
+  const p = url.pathname.startsWith(basePath())
+    ? url.pathname.slice(basePath().length)
+    : url.pathname;
+  return p.startsWith(prefix);
+}
+
+/** Construct a new same-origin URL resolved against the site’s base scope. */
+function scopedUrl(relativePath) {
+  return new URL(relativePath.replace(/^\/+/, ''), self.registration.scope).href;
+}
+
+/* --- Install / Activate -------------------------------------------------- */
 
 self.addEventListener('install', event => {
   event.waitUntil(
     (async () => {
       const cache = await caches.open(PRECACHE);
-      // Use cache:'reload' so we bypass any transient HTTP cache
       await cache.addAll(CORE.map(u => new Request(u, { cache: 'reload' })));
       await self.skipWaiting();
     })().catch(() => self.skipWaiting())
@@ -42,21 +58,19 @@ self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const names = await caches.keys();
     await Promise.all(
-      names
-        .filter(n => n !== PRECACHE && n !== RUNTIME)
-        .map(n => caches.delete(n))
+      names.filter(n => n !== PRECACHE && n !== RUNTIME).map(n => caches.delete(n))
     );
     await self.clients.claim();
   })());
 });
 
-/* ---------- Fetch ---------- */
+/* --- Fetch --------------------------------------------------------------- */
 
 self.addEventListener('fetch', event => {
   const req = event.request;
   const url = new URL(req.url);
 
-  // 1) Block leaderboard endpoints completely (for ANY method).
+  /* 1) Block leaderboard endpoints entirely (for ANY HTTP method). */
   if (BLOCKED_PATHS.some(rx => rx.test(url.pathname))) {
     event.respondWith(
       new Response(JSON.stringify({ ok: false, disabled: true, offline: true }), {
@@ -67,37 +81,47 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // For non-GET requests (that aren't blocked), let them pass through untouched.
+  /* 2) Non-GETs (not blocked) just pass through. */
   if (req.method !== 'GET') return;
 
-  // 2) Same-origin requests
-  if (url.origin === self.location.origin) {
-    // Treat navigation/documents as network-first so updates show quickly,
-    // with a fallback to cached shell (index.html) while offline.
-    if (req.mode === 'navigate' || req.destination === 'document' || req.destination === '') {
-      event.respondWith(networkFirstWithFallbackToShell(req));
+  /* 3) Same-origin request handling */
+  if (url.origin === location.origin) {
+    // 3a) If the app tries to go through '/server/...', rewrite to repo static:
+    //     '/server/anything'  ==>  './anything'
+    if (pathStartsWith(url, 'server/')) {
+      const rel = url.pathname.startsWith(basePath())
+        ? url.pathname.slice(basePath().length)   // strip '/<repo>/'
+        : url.pathname.replace(/^\//, '');
+      const stripped = rel.replace(/^server\//, '');
+      const newUrl = scopedUrl('./' + stripped);   // stay within site scope
+      event.respondWith(cacheFirstRuntime(new Request(newUrl, { credentials: 'same-origin' })));
       return;
     }
 
-    // Static assets (scripts, styles, images, audio, fonts, etc.): cache-first
+    // 3b) Documents: network-first with shell fallback
+    if (req.mode === 'navigate' || req.destination === 'document' || req.destination === '') {
+      event.respondWith(networkFirstWithShell(req));
+      return;
+    }
+
+    // 3c) Static assets: cache-first
     event.respondWith(cacheFirstRuntime(req));
     return;
   }
 
-  // 3) Cross-origin requests: network-first (then cached fallback)
+  /* 4) Cross-origin: network-first with cached fallback */
   event.respondWith(networkFirstRuntime(req));
 });
 
-/* ---------- Strategies ---------- */
+/* --- Strategies ---------------------------------------------------------- */
 
-async function networkFirstWithFallbackToShell(request) {
+async function networkFirstWithShell(request) {
   try {
     const fresh = await fetch(request);
     const rt = await caches.open(RUNTIME);
     rt.put(request, fresh.clone());
     return fresh;
   } catch {
-    // try runtime cache, then the shell
     const cached = await caches.match(request);
     return cached || caches.match('./index.html');
   }
@@ -113,7 +137,6 @@ async function cacheFirstRuntime(request) {
     rt.put(request, fresh.clone());
     return fresh;
   } catch {
-    // last resort: shell for same-origin doc requests; otherwise empty
     return (request.destination === 'document')
       ? (await caches.match('./index.html'))
       : new Response('', { status: 204 });
