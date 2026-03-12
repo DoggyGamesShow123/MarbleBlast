@@ -819,21 +819,6 @@
 
         $('#mbw-collapse')?.addEventListener('click', toggle);
 
-        ['log','info','warn','error'].forEach(k => {
-          const orig = console[k].bind(console);
-          console[k] = (...args) => {
-            try {
-              const text = args.map(a => {
-                if (a instanceof Error) return `${a.name}: ${a.message}\n${a.stack || ''}`;
-                if (typeof a === 'object') return JSON.stringify(a);
-                return String(a);
-              }).join(' ');
-              log(text, k === 'error' ? 'err' : (k === 'warn' ? 'warn' : 'info'));
-            } catch {}
-            return orig(...args);
-          };
-        });
-
         window.addEventListener('error', (e) => {
           const el = e?.target;
           if (el && (el.src || el.href)) {
@@ -864,6 +849,17 @@
         log(`pathname: ${location.pathname}`, 'info');
         log(`scope guess: ${location.origin}${location.pathname.replace(/\/[^/]*$/, '/')}`, 'info');
       })();
+    </script>
+
+    <!-- Register the Service Worker at the PROJECT PATH (MarbleBlast/) -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          // Register relative to this page so it resolves to /MarbleBlast/sw.js
+          navigator.serviceWorker.register('sw.js', { scope: './' })
+            .catch(console.error);
+        });
+      }
     </script>
   </body>
 </html>
