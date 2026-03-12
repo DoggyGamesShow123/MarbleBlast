@@ -2,6 +2,8 @@
 <html lang="en" translate="no" class="notranslate">
   <head>
     <meta charset="utf-8">
+    <!-- BASE HREF for GitHub Pages project site -->
+    <base href="/MarbleBlast/">
     <title>Marble Blast Web</title>
     <meta name="description" content="A web port of Marble Blast Gold and Marble Blast Platinum: In this 3D platformer classic, race your marble to the finish as fast as possible in more than 4100 diverse levels taken from Marble Blast Gold, Platinum and Ultra. Play Marble Blast online right in your browser or on your mobile device.">
     <meta name="keywords" content="marble, blast, gold, platinum, ultra, marbleblast, marbleblastgold, marbleblastplatinum, mbg, mbp, mbu, garagegames, torque, web, webport, port, online">
@@ -814,6 +816,7 @@
         });
 
         $('#mbw-clear-log')?.addEventListener('click', () => (logEl.textContent = ''));
+
         $('#mbw-collapse')?.addEventListener('click', toggle);
 
         ['log','info','warn','error'].forEach(k => {
@@ -821,4 +824,46 @@
           console[k] = (...args) => {
             try {
               const text = args.map(a => {
-                if (a instanceof Error
+                if (a instanceof Error) return `${a.name}: ${a.message}\n${a.stack || ''}`;
+                if (typeof a === 'object') return JSON.stringify(a);
+                return String(a);
+              }).join(' ');
+              log(text, k === 'error' ? 'err' : (k === 'warn' ? 'warn' : 'info'));
+            } catch {}
+            return orig(...args);
+          };
+        });
+
+        window.addEventListener('error', (e) => {
+          const el = e?.target;
+          if (el && (el.src || el.href)) {
+            const url = el.src || el.href;
+            log(`Resource error: ${url}`, 'err');
+          }
+        }, true);
+
+        const origFetch = window.fetch.bind(window);
+        window.fetch = async (...args) => {
+          const req = new Request(args[0], args[1]);
+          let res;
+          try {
+            res = await origFetch(req);
+          } catch (e) {
+            log(`Fetch failed: ${req.method} ${req.url} :: ${e}`, 'err');
+            throw e;
+          }
+          try {
+            if (!res.ok) {
+              log(`Fetch ${res.status}: ${req.method} ${req.url}`, res.status >= 500 ? 'err' : 'warn');
+            }
+          } catch {}
+          return res;
+        };
+
+        log(`baseURI: ${document.baseURI}`, 'info');
+        log(`pathname: ${location.pathname}`, 'info');
+        log(`scope guess: ${location.origin}${location.pathname.replace(/\/[^/]*$/, '/')}`, 'info');
+      })();
+    </script>
+  </body>
+</html>
