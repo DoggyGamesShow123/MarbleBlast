@@ -1,62 +1,79 @@
-name: Deploy MarbleBlast Web
+name: Build & Deploy MarbleBlast (Node 24)
 
 on:
   push:
     branches: [ "main" ]
   workflow_dispatch:
 
-# 1) Opt-in to Node.js 24 NOW (future-proof)
+# Remove the Node 20 deprecation warning and future-proof the workflow
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  # If you ever need to temporarily stay on Node 20 AFTER June 2, 2026:
+  # ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 
-# 2) (Optional Safety Switch)  
-# If GitHub breaks something AFTER June 2, 2026,  
-# uncomment this line temporarily to keep Node 20:
-# ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      # Updated to newest GitHub-supported versions (Node 24-ready)
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node 24
         uses: actions/setup-node@v4
         with:
-          node-version: 24   # Explicit Node 24 target
+          node-version: 24
+          cache: npm
 
+      # Optional visibility when debugging failures
+      - name: Print Node & npm versions
+        run: |
+          node -v
+          npm -v
+          npm run -s || true
+
+      # Follow the README: use --legacy-peer-deps to avoid peer-deps conflicts
+      # If a lockfile exists, 'npm ci' is preferred; otherwise fall back to install.
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm config set fund false audit false
+          if [ -f package-lock.json ]; then
+            npm ci --legacy-peer-deps
+          else
+            npm install --no-audit --no-fund --legacy-peer-deps
+          fi
 
-      - name: Build site
-        run: npm run build
+      # Create a production bundle into ./dist per README (Sarcina)
+      - name: Build bundle
+        run: npm run bundle
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      # Ensure the service worker is published at /MarbleBlast/sw.js
+      # (copy it to the bundle root if it exists in the repo)
+      - name: Include service worker in bundle
+        run: |
+          if [ -f sw.js ]; then
+            cp -f sw.js dist/sw.js
+          fi
+
+      - name: Upload artifact for Pages
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: github-pages
-          path: ./dist
-          retention-days: 1
+          path: dist
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
-
-    permissions:
-      pages: write
-      id-token: write
-
     steps:
-      - name: Configure GitHub Pages
+      - name: Configure Pages
         uses: actions/configure-pages@v5
-
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: github-pages
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
