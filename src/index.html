@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <!-- BASE HREF for GitHub Pages project site -->
-    /MarbleBlast/
+    <base href="/MarbleBlast/">
     <title>Marble Blast Web</title>
     <meta name="description" content="A web port of Marble Blast Gold and Marble Blast Platinum: In this 3D platformer classic, race your marble to the finish as fast as possible in more than 4100 diverse levels taken from Marble Blast Gold, Platinum and Ultra. Play Marble Blast online right in your browser or on your mobile device.">
     <meta name="keywords" content="marble, blast, gold, platinum, ultra, marbleblast, marbleblastgold, marbleblastplatinum, mbg, mbp, mbu, garagegames, torque, web, webport, port, online">
@@ -13,32 +13,32 @@
     <meta property="og:description" content="A web port of Marble Blast Gold and Marble Blast Platinum: In this 3D platformer classic, race your marble to the finish as fast as possible in more than 4100 diverse levels taken from Marble Blast Gold, Platinum and Ultra. Play Marble Blast online right in your browser or on your mobile device.">
     <meta property="og:image" content="https://marbleblast.vaniverse.io/assets/img/mbp.png">
     <!--<meta name="DISABLED twitter:card" content="summary_large_image">-->
-    ./assets/img/mbp.png
+    <link rel="shortcut icon" href="./assets/img/mbp.png" id="favicon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <!-- subpath-safe -->
-    ./manifest.json
-    ./assets/img/app-icon/180x180.png
-    ./assets/img/app-icon/180x180.png
+    <link rel="manifest" href="./manifest.json">
+    <link rel="apple-touch-icon" href="./assets/img/app-icon/180x180.png">
+    <link rel="apple-touch-icon image_src" href="./assets/img/app-icon/180x180.png">
 
-    ./css/main.css
-    ./css/popup.css
-    ./css/home.css
-    ./css/home_mbp.css
-    ./css/level_select.css
-    ./css/level_select_mbp.css
-    ./css/loading.css
-    ./css/loading_mbp.css
-    ./css/help.css
-    ./css/help_mbp.css
-    ./css/options.css
-    ./css/options_mbp.css
-    ./css/hud.css
-    ./css/touch_controls.css
-    ./css/pause_screen.css
-    ./css/pause_screen_mbp.css
-    ./css/finish_screen.css
-    ./css/finish_screen_mbp.css
-    ./css/video_renderer.css
+    <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="./css/popup.css">
+    <link rel="stylesheet" href="./css/home.css">
+    <link rel="stylesheet" href="./css/home_mbp.css">
+    <link rel="stylesheet" href="./css/level_select.css">
+    <link rel="stylesheet" href="./css/level_select_mbp.css">
+    <link rel="stylesheet" href="./css/loading.css">
+    <link rel="stylesheet" href="./css/loading_mbp.css">
+    <link rel="stylesheet" href="./css/help.css">
+    <link rel="stylesheet" href="./css/help_mbp.css">
+    <link rel="stylesheet" href="./css/options.css">
+    <link rel="stylesheet" href="./css/options_mbp.css">
+    <link rel="stylesheet" href="./css/hud.css">
+    <link rel="stylesheet" href="./css/touch_controls.css">
+    <link rel="stylesheet" href="./css/pause_screen.css">
+    <link rel="stylesheet" href="./css/pause_screen_mbp.css">
+    <link rel="stylesheet" href="./css/finish_screen.css">
+    <link rel="stylesheet" href="./css/finish_screen_mbp.css">
+    <link rel="stylesheet" href="./css/video_renderer.css">
   </head>
   <body>
     <!-- https://stackoverflow.com/questions/18524177/strange-click-event-bubble-on-iphone-safari-that-it-stop-before-bubbling-to-docu -->
@@ -56,9 +56,9 @@
     </div>
     <div id="fullscreen-enforcer" class="hidden">
       Tap to enter fullscreen<br><span style="opacity: 0.5; font-size: 18px;">(recommended for touch devices)</span>
-      ./assets/svg/close_white_24dp.svg
+      <img src="./assets/svg/close_white_24dp.svg">
     </div>
-    ./assets/svg/fullscreen_white_24dp.svg
+    <img src="./assets/svg/fullscreen_white_24dp.svg" id="enter-fullscreen" class="hidden">
     <div id="popup-container" style="display: none;"></div>
 
     <div id="game-ui" class="hidden">
@@ -71,42 +71,42 @@
         </div>
         <div id="camera-area"></div>
         <div id="action-buttons">
-          ./assets/img/up-arrow.png
-          ./assets/img/energy.png
-          ./assets/img/explosion.png
+          <img src="./assets/img/up-arrow.png" id="jump-button" class="touch-button">
+          <img src="./assets/img/energy.png" id="use-button" class="touch-button">
+          <img src="./assets/img/explosion.png" id="blast-button" class="touch-button">
         </div>
-        ./assets/img/pause-button.png
-        <div class="touch-button" id="restart-button">./assets/img/refresh.png</div>
-        ./assets/img/video-camera.png
+        <img src="./assets/img/pause-button.png" id="pause-button" class="touch-button">
+        <div class="touch-button" id="restart-button"><img src="./assets/img/refresh.png"></div>
+        <img src="./assets/img/video-camera.png" id="free-look-button" class="touch-button">
       </div>
       <div id="fps-meter">
-        ./assets/ui_mbp/game/transparency_fps-flipped.png
+        <img src="./assets/ui_mbp/game/transparency_fps-flipped.png" id="fps-meter-background">
         <div id="fps-meter-value">FPS: -</div>
       </div>
 
       <div id="pause-screen" class="hidden">
-        ./assets/ui/common/dialog.png
+        <img src="./assets/ui/common/dialog.png">
         <p>Exit from this Level?</p>
         <img id="pause-yes">
         <img id="pause-no">
         <img id="pause-restart">
-        ./assets/img/round_videocam_black_18dp.png
+        <img src="./assets/img/round_videocam_black_18dp.png" id="pause-replay" title="Click to view replay up until this point, Alt-Click to download it">
       </div>
 
       <div id="mbp-pause-screen" class="hidden">
         <div class="_background"></div>
         <div class="_center">
-          ./assets/ui_mbp/play/window.png
+          <img src="./assets/ui_mbp/play/window.png">
           <p>Exit from this Level?</p>
           <img id="mbp-pause-yes">
           <img id="mbp-pause-no">
           <img id="mbp-pause-restart">
           <img id="mbp-pause-replay" title="Click to view replay up until this point, Alt-Click to download it">
         </div>
-        ./assets/ui_mbp/jukebox/jb_pausemenu_n.png
+        <img src="./assets/ui_mbp/jukebox/jb_pausemenu_n.png" id="mbp-pause-jukebox">
 
         <div id="jukebox" class="hidden">
-          ./assets/ui_mbp/jukebox/window.png
+          <img src="./assets/ui_mbp/jukebox/window.png">
           <div id="jukebox-songs"></div>
           <p id="jukebox-text"></p>
           <img id="jukebox-close">
@@ -117,7 +117,7 @@
       </div>
 
       <div id="finish-screen" class="hidden">
-        ./assets/ui/play/playgui.png
+        <img src="./assets/ui/play/playgui.png">
         <div id="finish-screen-time">
           <p>Final Time:</p>
           <p id="finish-screen-time-time"></p>
@@ -148,19 +148,19 @@
         <div id="finish-best-times" style="clear: both; position: relative;"></div>
         <img id="finish-replay">
         <img id="finish-continue">
-        ./assets/img/round_videocam_black_18dp.png
+        <img src="./assets/img/round_videocam_black_18dp.png" id="finish-view-replay" title="Click to view replay, Alt-Click to download it">
       </div>
       <div id="name-entry-screen" class="hidden">
-        ./assets/ui/common/dialog.png
+        <img src="./assets/ui/common/dialog.png">
         <p>Congratulations!</p>
         <p></p>
-        ./assets/ui/common/window.png
+        <img src="./assets/ui/common/window.png" id="name-entry-input-background">
         <input type="text" id="name-entry-input" maxlength="16" autocomplete="off" autocorrect="off" spellcheck="false">
         <img id="name-entry-confirm">
       </div>
 
       <div id="mbp-finish-screen" class="hidden">
-        ./assets/ui_mbp/endgame/base.png
+        <img src="./assets/ui_mbp/endgame/base.png">
         <p id="mbp-finish-screen-time">Your Time: <span id="mbp-finish-screen-time-time"></span></p>
         <p id="mbp-finish-message"></p>
         <div id="mbp-finish-time-rows"></div>
@@ -173,10 +173,10 @@
         <img id="mbp-finish-view-replay" title="Click to view replay, Alt-Click to download it">
       </div>
       <div id="mbp-name-entry-screen" class="hidden">
-        ./assets/ui_mbp/endgame/enternamebox.png
+        <img src="./assets/ui_mbp/endgame/enternamebox.png">
         <p>Well Done!</p>
         <p></p>
-        ./assets/ui_mbp/endgame/window.png
+        <img src="./assets/ui_mbp/endgame/window.png" id="mbp-name-entry-input-background">
         <input type="text" id="mbp-name-entry-input" maxlength="16" autocomplete="off" autocorrect="off" spellcheck="false">
         <img id="mbp-name-entry-confirm">
       </div>
@@ -185,31 +185,31 @@
     <div id="mbp-menu" class="hidden">
       <img id="mbp-background-image">
       <p id="mbp-version"></p>
-      https://ko-fi.com/widgets/widget_2.js</script><script type='text/javascript'>kofiwidget2.init('Buy Me a Coffee', '#29abe0', 'O5O43J2HG');kofiwidget2.draw();</script>
+      <script type='text/javascript' src='https://ko-fi.com/widgets/widget_2.js'></script><script type='text/javascript'>kofiwidget2.init('Buy Me a Coffee', '#29abe0', 'O5O43J2HG');kofiwidget2.draw();</script>
 
       <div id="mbp-home-screen" class="hidden">
         <div class="_inner">
           <img id="mbp-home-quit">
           <img id="mbp-home-options">
-          ./assets/ui_mbp/menu/online_i.png
+          <img src="./assets/ui_mbp/menu/online_i.png" id="mbp-home-online">
           <img id="mbp-home-play">
           <img id="mbp-show-changelog">
           <img id="mbp-home-help">
-          <p style="position: absolute; bottom: -55px; left: 236px; transform: translateX(-50%); font-family: MarkerFelt; white-space: nowrap; text-align: center; font-size: 22px; background: #f43f5e; padding: 3px 20px; border-radius: 12px;">Check out the new https://www.youtube.com/watch?v=0er53mgNRaIUltra Levels World Record Rampage</a>!</p>
+          <p style="position: absolute; bottom: -55px; left: 236px; transform: translateX(-50%); font-family: MarkerFelt; white-space: nowrap; text-align: center; font-size: 22px; background: #f43f5e; padding: 3px 20px; border-radius: 12px;">Check out the new <a href="https://www.youtube.com/watch?v=0er53mgNRaI" target="_blank">Ultra Levels World Record Rampage</a>!</p>
         </div>
-        ./assets/ui_mbp/menu/mbp.png
-        ./assets/img/marble-blast-gold-logo.png
+        <img src="./assets/ui_mbp/menu/mbp.png" id="mbp-logo">
+        <img src="./assets/img/marble-blast-gold-logo.png" class="modification-switcher" title="Switch to Marble Blast Gold">
       </div>
 
       <div id="mbp-changelog" class="hidden">
         <div class="_click-preventer"></div>
-        ./assets/ui_mbp/motd/messagewindow.png
+        <img src="./assets/ui_mbp/motd/messagewindow.png">
         <div id="mbp-changelog-content"></div>
         <img id="mbp-changelog-back">
       </div>
 
       <div id="mbp-level-select" class="hidden">
-        ./assets/ui_mbp/play/window.png
+        <img src="./assets/ui_mbp/play/window.png" style="pointer-events: none; display: block;">
         <img id="mbp-level-select-home-button">
         <img id="mbp-level-select-view-toggle" title="Show scores">
         <img id="mbp-load-replay-button" title="Load replay from file (Shift-Click to render replay to video, Alt-Shift-Click to render compilation)">
@@ -219,18 +219,18 @@
         <img id="mbp-level-select-next">
 
         <img id="mbp-level-image">
-        ./assets/ui_mbp/play/levelframe.png
+        <img src="./assets/ui_mbp/play/levelframe.png" id="mbp-level-select-frame">
         <img id="mbp-level-select-egg" class="hidden">
         <div id="mbp-search-bar"></div>
         <input id="mbp-search-input" maxlength="40" placeholder="Search levels" autocomplete="off" autocorrect="off" spellcheck="false">
-        ./assets/svg/event_FILL0_wght400_GRAD0_opsz24.svg
+        <img id="mbp-sort-icon" src="./assets/svg/event_FILL0_wght400_GRAD0_opsz24.svg" title="Toggle sort">
 
         <div id="mbp-difficulty-selector">
           <img id="mbp-difficulty-selector-collapsed">
           <img id="mbp-difficulty-selector-modification-icon">
           <div id="mbp-difficulty-selector-window" class="hidden">
             <div class="_click-preventer"></div>
-            ./assets/ui_mbp/mp/menu/brown/tabt.png
+            <img src="./assets/ui_mbp/mp/menu/brown/tabt.png" id="mbp-difficulty-selector-window-tabt">
             <div id="mbp-difficulty-selector-window-divider"></div>
             <div class="_content"></div>
           </div>
@@ -253,30 +253,30 @@
 
       <div id="mbp-loading" class="hidden">
         <div id="mbp-loading-progress"></div>
-        ./assets/ui_mbp/loading/loadinggui.png
-        ./assets/ui_mbp/loading/overlay.png
+        <img src="./assets/ui_mbp/loading/loadinggui.png">
+        <img src="./assets/ui_mbp/loading/overlay.png" id="mbp-loading-overlay">
         <img id="mbp-loading-cancel">
         <p id="mbp-loading-level-name"></p>
       </div>
 
       <div id="mbp-options" class="hidden">
-        ./assets/ui_mbp/options/window.png
+        <img src="./assets/ui_mbp/options/window.png">
         <img id="mbp-options-home">
         <img id="mbp-options-apply">
         <img id="mbp-options-general">
         <img id="mbp-options-hotkeys">
-        ./assets/ui_mbp/options/online_i.png
+        <img src="./assets/ui_mbp/options/online_i.png" id="mbp-options-online">
         <div id="mbp-options-container-wrapper">
           <div class="_container" id="mbp-options-general-container"></div>
           <div class="_container" id="mbp-options-hotkeys-container"></div>
         </div>
 
         <div id="mbp-rebind-dialog" class="hidden">
-          ./assets/ui_mbp/play/window.png
+          <img src="./assets/ui_mbp/play/window.png">
           <p></p>
         </div>
         <div id="mbp-rebind-confirm" class="hidden">
-          ./assets/ui_mbp/play/text_window.png
+          <img src="./assets/ui_mbp/play/text_window.png">
           <p></p>
           <h6>WARNING</h6>
           <img id="mbp-rebind-confirm-yes">
@@ -285,14 +285,14 @@
       </div>
 
       <div id="mbp-help" class="hidden">
-        ./assets/ui_mbp/manual/window.png
+        <img src="./assets/ui_mbp/manual/window.png">
         <img id="mbp-help-home">
         <div id="mbp-help-picker"></div>
       </div>
     </div>
 
     <div id="menu" class="hidden">
-      ./assets/ui/background.jpg
+      <img src="./assets/ui/background.jpg" id="background-image">
       <p id="version"></p>
       
       <style>
@@ -303,24 +303,24 @@
           z-index: 1;
         }
       </style>
-      https://ko-fi.com/widgets/widget_2.js</script><script type='text/javascript'>kofiwidget2.init('Buy Me a Coffee', '#29abe0', 'O5O43J2HG');kofiwidget2.draw();</script>
+      <script type='text/javascript' src='https://ko-fi.com/widgets/widget_2.js'></script><script type='text/javascript'>kofiwidget2.init('Buy Me a Coffee', '#29abe0', 'O5O43J2HG');kofiwidget2.draw();</script>
 
       <div id="home-screen" class="hidden">
         <div class="_inner">
-          ./assets/ui/home/homegui.png
+          <img src="./assets/ui/home/homegui.png">
           <img id="home-play">
           <img id="home-help">
           <img id="home-options">
-          ./assets/ui/home/exit_n.png
-          <p style="position: absolute; bottom: -60px; left: 50%; transform: translateX(-50%); font-family: DomCasualRegular; white-space: nowrap; text-align: center; font-size: 22px; background: #f43f5e; padding: 3px 20px; border-radius: 12px;">Check out the new https://www.youtube.com/watch?v=0er53mgNRaIUltra Levels World Record Rampage</a>!</p>
+          <img src="./assets/ui/home/exit_n.png" id="home-exit">
+          <p style="position: absolute; bottom: -60px; left: 50%; transform: translateX(-50%); font-family: DomCasualRegular; white-space: nowrap; text-align: center; font-size: 22px; background: #f43f5e; padding: 3px 20px; border-radius: 12px;">Check out the new <a href="https://www.youtube.com/watch?v=0er53mgNRaI" target="_blank">Ultra Levels World Record Rampage</a>!</p>
         </div>
         <img id="show-changelog">
         <div id="show-changelog-text">Changelog</div>
-        ./assets/img/mbp.png
+        <img src="./assets/img/mbp.png" class="modification-switcher" title="Switch to Marble Blast Platinum">
       </div>
 
       <div id="changelog" class="hidden">
-        ./assets/ui/play/playgui.png
+        <img src="./assets/ui/play/playgui.png">
         <div>
           <div id="changelog-content"></div>
         </div>
@@ -328,13 +328,13 @@
       </div>
 
       <div id="level-select" class="hidden">
-        ./assets/ui/play/playgui.png
-        ./assets/ui/play/tab_begin.png
-        ./assets/ui/play/tab_inter.png
-        ./assets/ui/play/tab_adv.png
-        ./assets/ui/play/cust_tab.png
+        <img src="./assets/ui/play/playgui.png" style="pointer-events: none; display: block;">
+        <img src="./assets/ui/play/tab_begin.png" id="tab-beginner">
+        <img src="./assets/ui/play/tab_inter.png" id="tab-intermediate">
+        <img src="./assets/ui/play/tab_adv.png" id="tab-advanced">
+        <img src="./assets/ui/play/cust_tab.png" id="tab-custom">
         <div id="level-select-text-window">
-          ./assets/ui/play/text_window.png
+          <img src="./assets/ui/play/text_window.png" style="position: absolute; top: 0; left: 0; z-index: -1;">
           <div id="level-select-text-window-scrollable">
             <p id="level-title"></p>
             <p id="level-artist"></p>
@@ -347,32 +347,32 @@
             <div id="leaderboard-scores" style="box-sizing: border-box;"></div>
           </div>
         </div>
-        ./assets/ui/play/back_n.png
+        <img src="./assets/ui/play/back_n.png" id="level-select-home-button">
         <div id="level-select-level-window">
-          ./assets/ui/play/level_window.png
+          <img src="./assets/ui/play/level_window.png">
           <img id="level-image">
           <p id="level-number"></p>
           <div id="search-bar"></div>
           <input id="search-input" maxlength="40" placeholder="Search levels" autocomplete="off" autocorrect="off" spellcheck="false">
-          ./assets/svg/event_FILL0_wght400_GRAD0_opsz24.svg
+          <img id="sort-icon" src="./assets/svg/event_FILL0_wght400_GRAD0_opsz24.svg" title="Toggle sort">
           <p id="new-badge" class="hidden">New!</p>
         </div>
         <img id="level-select-prev">
         <img id="level-select-play">
         <img id="level-select-next">
-        ./assets/img/round_play_circle_outline_black_18dp.png
-        ./assets/img/shuffle.png
+        <img src="./assets/img/round_play_circle_outline_black_18dp.png" id="load-replay-button" title="Load replay from file (Shift-Click to render replay to video, Alt-Shift-Click to render compilation)">
+        <img src="./assets/img/shuffle.png" id="shuffle-button" title="Go to random level">
       </div>
 
       <div id="loading" class="hidden">
         <div id="loading-progress"></div>
-        ./assets/ui/loading/loadinggui.png
+        <img src="./assets/ui/loading/loadinggui.png">
         <img id="loading-cancel">
         <p id="loading-level-name"></p>
       </div>
 
       <div id="help" class="hidden">
-        ./assets/ui/play/playgui.png
+        <img src="./assets/ui/play/playgui.png">
         <div>
           <div class="help-page">
             <div class="help-heading">Overview</div>
@@ -506,7 +506,7 @@
           </div>
           <div class="help-page">
             <div class="help-heading">Web Port</div>
-            <div class="help-paragraph">This web port of Marble Blast Gold was done by Vanilagy - all the code is free to access on https://github.com/Vanilagy/MarbleBlastGitHub</a>. Full rights go to GarageGames and other creators of this game. Special thanks to the maintainers of three.js and OimoPhysics for making this project possible!</div>
+            <div class="help-paragraph">This web port of Marble Blast Gold was done by Vanilagy - all the code is free to access on <a href="https://github.com/Vanilagy/MarbleBlast" target="_blank">GitHub</a>. Full rights go to GarageGames and other creators of this game. Special thanks to the maintainers of three.js and OimoPhysics for making this project possible!</div>
           </div>
         </div>
         <img id="help-prev">
@@ -515,14 +515,14 @@
       </div>
 
       <div id="options" class="hidden">
-        ./assets/ui/options/options_base.png
-        ./assets/ui/options/graf_tab.png
-        ./assets/ui/options/aud_tab.png
-        ./assets/ui/options/cntr_tab.png
-        ./assets/ui/options/mainm_n.png
+        <img src="./assets/ui/options/options_base.png" style="pointer-events: none; display: block;">
+        <img src="./assets/ui/options/graf_tab.png" id="tab-graphics">
+        <img src="./assets/ui/options/aud_tab.png" id="tab-audio">
+        <img src="./assets/ui/options/cntr_tab.png" id="tab-controls">
+        <img src="./assets/ui/options/mainm_n.png" id="options-home">
 
         <div id="options-graphics">
-          ./assets/ui/options/graf_txt.png
+          <img src="./assets/ui/options/graf_txt.png" id="graphics-text">
           <img id="graphics-640">
           <img id="graphics-800">
           <img id="graphics-1024">
@@ -544,11 +544,11 @@
         </div>
 
         <div id="options-audio">
-          ./assets/ui/options/aud_mus_slide.png
-          ./assets/ui/options/aud_mus_knb.png
-          ./assets/ui/options/aud_snd_slide.png
-          ./assets/ui/options/aud_snd_knb.png
-          ./assets/ui/options/aud_txt_wndo.png
+          <img src="./assets/ui/options/aud_mus_slide.png" id="audio-music-track">
+          <img src="./assets/ui/options/aud_mus_knb.png" id="audio-music-knob">
+          <img src="./assets/ui/options/aud_snd_slide.png" id="audio-sound-track">
+          <img src="./assets/ui/options/aud_snd_knb.png" id="audio-sound-knob">
+          <img src="./assets/ui/options/aud_txt_wndo.png" id="audio-text-window">
           <div id="audio-text">
             Vendor: Creative Labs Inc.<br>
             Version: OpenAL 1.0<br>
@@ -558,17 +558,17 @@
         </div>
 
         <div id="options-controls">
-          ./assets/ui/options/cntrl_marb_bse.png
+          <img src="./assets/ui/options/cntrl_marb_bse.png" id="controls-background">
           <div id="tab-marble"></div>
           <div id="tab-camera"></div>
           <div id="tab-mouse"></div>
 
           <div id="rebind-dialog" class="hidden">
-            ./assets/ui/common/dialog.png
+            <img src="./assets/ui/common/dialog.png">
             <p></p>
           </div>
           <div id="rebind-confirm" class="hidden">
-            ./assets/ui/common/dialog.png
+            <img src="./assets/ui/common/dialog.png">
             <p></p>
             <img id="rebind-confirm-yes">
             <img id="rebind-confirm-no">
@@ -599,7 +599,7 @@
             <p id="button-camera-down-content"></p>
           </div>
           <div id="controls-mouse">
-            ./assets/ui/options/cntrl_mous_knb.png
+            <img src="./assets/ui/options/cntrl_mous_knb.png" id="sensitivity-knob">
             <img id="invert-y">
             <img id="always-free-look">
             <img id="free-look-key">
@@ -654,30 +654,99 @@
     <div style="font-family: MarkerFelt; opacity: 0; pointer-events: none;">ABC</div>
     <div style="font-family: Chakra Petch; opacity: 0; pointer-events: none;">ABC</div>
     
-    ./lib/oggdec.js</script>
-    ./lib/pako.js</script>
-    ./lib/jszip.js</script>
+    <script src="./lib/oggdec.js" defer></script>
+    <script src="./lib/pako.js" defer></script>
+    <script src="./lib/jszip.js" defer></script>
     <div></div> <!-- Force Sarcina to put these into different bundles -->
     <!-- Main bundle -->
-    ./js/bundle.js</script>
+    <script src="./js/bundle.js" defer></script>
 
     <!-- Temp Dev Tools overlay (toggle with ~). Remove when done. -->
     <style id="mbw-devtools-style">
-      /* (unchanged styles) */
+      #mbw-devtools {
+        all: initial;
+        position: fixed;
+        z-index: 999999;
+        top: 12px;
+        right: 12px;
+        width: 380px;
+        max-height: 70vh;
+        background: rgba(15, 23, 42, 0.95);
+        color: #e5e7eb;
+        font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(0,0,0,.35);
+        display: grid;
+        grid-template-rows: auto auto 1fr;
+        overflow: hidden;
+      }
+      #mbw-devtools header {
+        display: flex; align-items: center; gap: 8px;
+        padding: 8px 10px; background: #0b1220; border-bottom: 1px solid #334155;
+      }
+      #mbw-devtools header b { color: #93c5fd; font-weight: 700; }
+      #mbw-devtools .row {
+        display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 10px; border-bottom: 1px solid #334155;
+      }
+      #mbw-devtools button {
+        all: unset; cursor: pointer; padding: 6px 10px; border-radius: 6px;
+        background: #1f2937; border: 1px solid #4b5563; color: #e5e7eb;
+      }
+      #mbw-devtools button:hover { background:#374151; }
+      #mbw-devtools .pill { padding: 2px 6px; border: 1px solid #475569; border-radius: 999px; background:#111827; }
+      #mbw-devtools .muted { color:#9ca3af; }
+      #mbw-devtools .log {
+        padding: 8px 10px; overflow: auto; background:#0a0f1a;
+        font-size: 12px; white-space: pre-wrap; word-break: break-word;
+      }
+      #mbw-devtools .log .ok    { color:#bbf7d0; }
+      #mbw-devtools .log .warn  { color:#fde68a; }
+      #mbw-devtools .log .err   { color:#fecaca; }
+      #mbw-devtools .log .info  { color:#bae6fd; }
+      #mbw-devtools .foot {
+        padding:6px 10px; background:#0b1220; border-top:1px solid #334155;
+        display:flex; justify-content:space-between; align-items:center; gap:6px;
+      }
+      #mbw-devtools .linkish { color:#93c5fd; cursor:pointer; text-decoration:underline; }
+      #mbw-devtools.hidden { display:none; }
     </style>
 
     <div id="mbw-devtools" class="hidden" role="region" aria-label="Temp Dev Tools">
-      <!-- (unchanged overlay markup) -->
+      <header>
+        <b>Temp Dev Tools</b>
+        <span class="pill" id="mbw-sw-state">SW: n/a</span>
+        <span class="pill" id="mbw-base">base: n/a</span>
+      </header>
+
+      <div class="row">
+        <button id="mbw-sw-info">SW Info</button>
+        <button id="mbw-sw-unreg">SW Unregister</button>
+        <button id="mbw-clear-caches">Clear Caches</button>
+        <button id="mbw-reload">Reload</button>
+        <button id="mbw-bust">Reload (bust)</button>
+        <button id="mbw-clear-log">Clear Log</button>
+        <span class="muted">Toggle: <b>~</b></span>
+      </div>
+
+      <div class="log" id="mbw-log" aria-live="polite"></div>
+
+      <div class="foot">
+        <span class="muted">Capturing: fetch errors, resource errors, console</span>
+        <span class="linkish" id="mbw-collapse">Hide</span>
+      </div>
     </div>
 
     <script>
       (() => {
         if (location.search.includes('nodevtools')) return;
+
         const $ = (s, r = document) => r.querySelector(s);
         const panel  = $('#mbw-devtools');
         const logEl  = $('#mbw-log');
         const swPill = $('#mbw-sw-state');
         const basePill = $('#mbw-base');
+
         const log = (msg, cls='info') => {
           const time = new Date().toLocaleTimeString();
           const div = document.createElement('div');
@@ -686,11 +755,14 @@
           logEl.appendChild(div);
           logEl.scrollTop = logEl.scrollHeight;
         };
+
         const toggle = () => panel.classList.toggle('hidden');
         document.addEventListener('keydown', (e) => { if (e.key === '~') toggle(); });
         window.addEventListener('load', () => setTimeout(() => panel.classList.remove('hidden'), 300));
+
         const baseTag = document.querySelector('base');
         basePill.textContent = `base: ${baseTag?.getAttribute('href') || '(none)'}`;
+
         async function refreshSWStatus() {
           try {
             const regs = await navigator.serviceWorker?.getRegistrations?.() || [];
@@ -702,7 +774,77 @@
           }
         }
         refreshSWStatus();
-        // ... (rest of your overlay JS unchanged)
+
+        $('#mbw-sw-info')?.addEventListener('click', async () => {
+          try {
+            const regs = await navigator.serviceWorker?.getRegistrations?.() || [];
+            const states = regs.map(r => ({
+              scope: r.scope,
+              active: !!r.active,
+              installing: !!r.installing,
+              waiting: !!r.waiting,
+            }));
+            log(`SW Info: ${JSON.stringify(states, null, 2)}`, 'info');
+          } catch (e) { log(`SW Info error: ${e}`, 'err'); }
+        });
+
+        $('#mbw-sw-unreg')?.addEventListener('click', async () => {
+          try {
+            const regs = await navigator.serviceWorker?.getRegistrations?.() || [];
+            await Promise.all(regs.map(r => r.unregister()));
+            await caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))));
+            await refreshSWStatus();
+            log('Unregistered all SWs and cleared caches. Reloading…', 'warn');
+            setTimeout(() => location.reload(), 400);
+          } catch (e) { log(`SW Unregister error: ${e}`, 'err'); }
+        });
+
+        $('#mbw-clear-caches')?.addEventListener('click', async () => {
+          try {
+            const keys = await caches.keys();
+            await Promise.all(keys.map(k => caches.delete(k)));
+            log(`Cleared caches: [${keys.join(', ')}]`, 'warn');
+          } catch (e) { log(`Clear caches error: ${e}`, 'err'); }
+        });
+
+        $('#mbw-reload')?.addEventListener('click', () => location.reload());
+
+        $('#mbw-bust')?.addEventListener('click', () => {
+          const u = new URL(location.href);
+          u.searchParams.set('_bust', Date.now().toString());
+          location.href = u.toString();
+        });
+
+        $('#mbw-clear-log')?.addEventListener('click', () => (logEl.textContent = ''));
+
+        $('#mbw-collapse')?.addEventListener('click', toggle);
+
+        window.addEventListener('error', (e) => {
+          const el = e?.target;
+          if (el && (el.src || el.href)) {
+            const url = el.src || el.href;
+            log(`Resource error: ${url}`, 'err');
+          }
+        }, true);
+
+        const origFetch = window.fetch.bind(window);
+        window.fetch = async (...args) => {
+          const req = new Request(args[0], args[1]);
+          let res;
+          try {
+            res = await origFetch(req);
+          } catch (e) {
+            log(`Fetch failed: ${req.method} ${req.url} :: ${e}`, 'err');
+            throw e;
+          }
+          try {
+            if (!res.ok) {
+              log(`Fetch ${res.status}: ${req.method} ${req.url}`, res.status >= 500 ? 'err' : 'warn');
+            }
+          } catch {}
+          return res;
+        };
+
         log(`baseURI: ${document.baseURI}`, 'info');
         log(`pathname: ${location.pathname}`, 'info');
         log(`scope guess: ${location.origin}${location.pathname.replace(/\/[^/]*$/, '/')}`, 'info');
